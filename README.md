@@ -28,12 +28,9 @@ Integrity](https://w3c.github.io/webappsec/specs/subresourceintegrity/) hashes.
   * Integrity Generation
     * [`fromHex`](#from-hex)
     * [`fromData`](#from-data)
-    * [`fromStream`](#from-stream)
     * [`create`](#create)
   * Integrity Verification
     * [`checkData`](#check-data)
-    * [`checkStream`](#check-stream)
-    * [`integrityStream`](#integrity-stream)
 
 ### Example
 
@@ -47,13 +44,6 @@ const parsed = ssri.parse(integrity)
 ssri.stringify(parsed) // === integrity (works on non-Integrity objects)
 parsed.toString() // === integrity
 
-// Async stream functions
-ssri.checkStream(fs.createReadStream('./my-file'), integrity).then(...)
-ssri.fromStream(fs.createReadStream('./my-file')).then(sri => {
-  sri.toString() === integrity
-})
-fs.createReadStream('./my-file').pipe(ssri.createCheckerStream(sri))
-
 // Sync data functions
 ssri.fromData(fs.readFileSync('./my-file')) // === parsed
 ssri.checkData(fs.readFileSync('./my-file'), integrity) // => 'sha512'
@@ -62,7 +52,7 @@ ssri.checkData(fs.readFileSync('./my-file'), integrity) // => 'sha512'
 ### Features
 
 * Parses and stringifies SRI strings.
-* Generates SRI strings from raw data or Streams.
+* Generates SRI strings from raw data.
 * Strict standard compliance.
 * `?foo` metadata option support.
 * Multiple entries for the same algorithm.
@@ -368,30 +358,6 @@ integrity.toString('\n')
 // sha512-yzd8ELD1piyANiWnmdnpCL5F52f10UfUdEkHywVZeqTt0ymgrxR63Qz0GB7TKPoeeZQmWCaz7T1+9vBnypkYWg==
 ```
 
-#### <a name="from-stream"></a> `> ssri.fromStream(stream, [opts]) -> Promise<Integrity>`
-
-Returns a Promise of an Integrity object calculated by reading data from
-a given `stream`.
-
-It accepts both `opts.algorithms` and `opts.options`, which are documented as
-part of [`ssri.fromData`](#from-data).
-
-Additionally, `opts.Promise` may be passed in to inject a Promise library of
-choice. By default, ssri will use Node's built-in Promises.
-
-If `opts.strict` is true, the integrity object will be created using strict
-parsing rules. See [`ssri.parse`](#parse).
-
-##### Example
-
-```javascript
-ssri.fromStream(fs.createReadStream('index.js'), {
-  algorithms: ['sha1', 'sha512']
-}).then(integrity => {
-  return ssri.checkStream(fs.createReadStream('index.js'), integrity)
-}) // succeeds
-```
-
 #### <a name="create"></a> `> ssri.create([opts]) -> <Hash>`
 
 Returns a Hash object with `update(<Buffer or string>[,enc])` and `digest()` methods.
@@ -440,89 +406,4 @@ ssri.checkData(data, ssri.fromData(data)) // -> 'sha512'
 ssri.checkData(data, 'sha256-l981iLWj8kurw4UbNy8Lpxqdzd7UOxS50Glhv8FwfZ0')
 ssri.checkData(data, 'sha1-BaDDigEST') // -> false
 ssri.checkData(data, 'sha1-BaDDigEST', {error: true}) // -> Error! EINTEGRITY
-```
-
-#### <a name="check-stream"></a> `> ssri.checkStream(stream, sri, [opts]) -> Promise<Hash>`
-
-Verifies the contents of `stream` against an `sri` argument. `stream` will be
-consumed in its entirety by this process. `sri` can be any subresource integrity
-representation that [`ssri.parse`](#parse) can handle.
-
-`checkStream` will return a Promise that either resolves to the
-`Hash` that succeeded verification, or, if the verification fails
-or an error happens with `stream`, the Promise will be rejected.
-
-If the Promise is rejected because verification failed, the returned error will
-have `err.code` as `EINTEGRITY`.
-
-If `opts.size` is given, it will be matched against the stream size. An error
-with `err.code` `EBADSIZE` will be returned by a rejection if the expected size
-and actual size fail to match.
-
-If `opts.pickAlgorithm` is provided, it will be used by
-[`Integrity#pickAlgorithm`](#integrity-pick-algorithm) when deciding which of
-the available digests to match against.
-
-##### Example
-
-```javascript
-const integrity = ssri.fromData(fs.readFileSync('index.js'))
-
-ssri.checkStream(
-  fs.createReadStream('index.js'),
-  integrity
-)
-// ->
-// Promise<{
-//   algorithm: 'sha512',
-//   digest: 'sha512-yzd8ELD1piyANiWnmdnpCL5F52f10UfUdEkHywVZeqTt0ymgrxR63Qz0GB7TKPoeeZQmWCaz7T1'
-// }>
-
-ssri.checkStream(
-  fs.createReadStream('index.js'),
-  'sha256-l981iLWj8kurw4UbNy8Lpxqdzd7UOxS50Glhv8FwfZ0'
-) // -> Promise<Hash>
-
-ssri.checkStream(
-  fs.createReadStream('index.js'),
-  'sha1-BaDDigEST'
-) // -> Promise<Error<{code: 'EINTEGRITY'}>>
-```
-
-#### <a name="integrity-stream"></a> `> integrityStream([opts]) -> IntegrityStream`
-
-Returns a `Transform` stream that data can be piped through in order to generate
-and optionally check data integrity for piped data. When the stream completes
-successfully, it emits `size` and `integrity` events, containing the total
-number of bytes processed and a calculated `Integrity` instance based on stream
-data, respectively.
-
-If `opts.algorithms` is passed in, the listed algorithms will be calculated when
-generating the final `Integrity` instance. The default is `['sha512']`.
-
-If `opts.single` is passed in, a single `Hash` instance will be returned.
-
-If `opts.integrity` is passed in, it should be an `integrity` value understood
-by [`parse`](#parse) that the stream will check the data against. If
-verification succeeds, the integrity stream will emit a `verified` event whose
-value is a single `Hash` object that is the one that succeeded verification. If
-verification fails, the stream will error with an `EINTEGRITY` error code.
-
-If `opts.size` is given, it will be matched against the stream size. An error
-with `err.code` `EBADSIZE` will be emitted by the stream if the expected size
-and actual size fail to match.
-
-If `opts.pickAlgorithm` is provided, it will be passed two algorithms as
-arguments. ssri will prioritize whichever of the two algorithms is returned by
-this function. Note that the function may be called multiple times, and it
-**must** return one of the two algorithms provided. By default, ssri will make
-a best-effort to pick the strongest/most reliable of the given algorithms. It
-may intentionally deprioritize algorithms with known vulnerabilities.
-
-##### Example
-
-```javascript
-const integrity = ssri.fromData(fs.readFileSync('index.js'))
-fs.createReadStream('index.js')
-.pipe(ssri.integrityStream({integrity}))
 ```

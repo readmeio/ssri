@@ -1,18 +1,17 @@
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+import crypto from 'crypto';
+import fs from 'fs';
 
-const test = require('tap').test;
+import { test as tap } from 'tap';
 
-const ssri = require('../src');
+import ssri = require('../src');
 
 const TEST_DATA = fs.readFileSync(__filename);
 
-function hash(data, algorithm) {
+function hash(data: any, algorithm: string) {
   return crypto.createHash(algorithm).update(data).digest('base64');
 }
 
-test('checkData', t => {
+tap('checkData', t => {
   const sri = ssri.parse({
     algorithm: 'sha512',
     digest: hash(TEST_DATA, 'sha512'),
@@ -68,7 +67,7 @@ test('checkData', t => {
       TEST_DATA,
       ['sha512-nope', `sha1-${hash(TEST_DATA, 'sha1')}`, `sha512-${hash(TEST_DATA, 'sha512')}`].join(' '),
       {
-        pickAlgorithm: (a, b) => {
+        pickAlgorithm: (a: string, b: string) => {
           if (a === 'sha1' || b === 'sha1') {
             return 'sha1';
           }
@@ -91,7 +90,7 @@ test('checkData', t => {
         `sha512-${hash(TEST_DATA, 'sha512')}`,
       ].join(' '),
       {
-        pickAlgorithm: (a, b) => {
+        pickAlgorithm: () => {
           return false;
         },
       }

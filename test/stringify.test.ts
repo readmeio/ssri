@@ -1,17 +1,17 @@
-const crypto = require('crypto');
-const fs = require('fs');
+import crypto from 'crypto';
+import fs from 'fs';
 
-const test = require('tap').test;
+import { test as tap } from 'tap';
 
-const ssri = require('..');
+import ssri from '../src';
 
 const TEST_DATA = fs.readFileSync(__filename);
 
-function hash(data, algorithm) {
+function hash(data: any, algorithm: string) {
   return crypto.createHash(algorithm).update(data).digest('base64');
 }
 
-test('serializes Integrity-likes', t => {
+tap('serializes Integrity-likes', t => {
   const sriLike = {
     sha512: [
       {
@@ -39,7 +39,7 @@ test('serializes Integrity-likes', t => {
   t.end();
 });
 
-test('serializes Hash-likes', t => {
+tap('serializes Hash-likes', t => {
   const sriLike = {
     digest: 'foo',
     algorithm: 'sha512',
@@ -48,13 +48,13 @@ test('serializes Hash-likes', t => {
   t.end();
 });
 
-test('serialized plain strings into a valid parsed version', t => {
+tap('serialized plain strings into a valid parsed version', t => {
   const sri = ' \tsha512-foo?bar    \n\n\nsha1-nope\r';
   t.equal(ssri.stringify(sri), 'sha512-foo?bar sha1-nope', 'cleaned-up string with identical contents generated');
   t.end();
 });
 
-test('accepts a separator opt', t => {
+tap('accepts a separator opt', t => {
   const sriLike = {
     sha512: [
       {
@@ -72,7 +72,7 @@ test('accepts a separator opt', t => {
   t.end();
 });
 
-test('support strict serialization', t => {
+tap('support strict serialization', t => {
   const sriLike = {
     // only sha256, sha384, and sha512 are allowed by the spec
     sha1: [

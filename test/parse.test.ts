@@ -1,17 +1,17 @@
-const crypto = require('crypto');
-const fs = require('fs');
+import crypto from 'crypto';
+import fs from 'fs';
 
-const test = require('tap').test;
+import { test as tap } from 'tap';
 
-const ssri = require('../src');
+import ssri from '../src';
 
 const TEST_DATA = fs.readFileSync(__filename);
 
-function hash(data, algorithm) {
+function hash(data: any, algorithm: string) {
   return crypto.createHash(algorithm).update(data).digest('base64');
 }
 
-test('parses single-entry integrity string', t => {
+tap('parses single-entry integrity string', t => {
   const sha = hash(TEST_DATA, 'sha512');
   const integrity = `sha512-${sha}`;
   t.same(
@@ -31,7 +31,7 @@ test('parses single-entry integrity string', t => {
   t.end();
 });
 
-test('parses options from integrity string', t => {
+tap('parses options from integrity string', t => {
   const sha = hash(TEST_DATA, 'sha512');
   const integrity = `sha512-${sha}?one?two?three`;
   t.same(
@@ -51,7 +51,7 @@ test('parses options from integrity string', t => {
   t.end();
 });
 
-test('parses options from integrity string in strict mode', t => {
+tap('parses options from integrity string in strict mode', t => {
   const sha = hash(TEST_DATA, 'sha512');
   const integrity = `sha512-${sha}?one?two?three`;
   t.same(
@@ -71,7 +71,7 @@ test('parses options from integrity string in strict mode', t => {
   t.end();
 });
 
-test('can parse single-entry string directly into Hash', t => {
+tap('can parse single-entry string directly into Hash', t => {
   const sha = hash(TEST_DATA, 'sha512');
   const integrity = `sha512-${sha}`;
   t.same(
@@ -87,7 +87,7 @@ test('can parse single-entry string directly into Hash', t => {
   t.end();
 });
 
-test('accepts Hash-likes as input', t => {
+tap('accepts Hash-likes as input', t => {
   const algorithm = 'sha512';
   const digest = hash(TEST_DATA, 'sha512');
   const sriLike = {
@@ -113,7 +113,7 @@ test('accepts Hash-likes as input', t => {
   t.end();
 });
 
-test('omits unsupported algos in strict mode only', t => {
+tap('omits unsupported algos in strict mode only', t => {
   const xxx = new Array(50).join('x');
 
   t.match(
@@ -158,14 +158,14 @@ test('omits unsupported algos in strict mode only', t => {
   t.end();
 });
 
-test('use " " as sep when opts.sep is falsey', t => {
+tap('use " " as sep when opts.sep is falsey', t => {
   const parsed = ssri.parse('yum-somehash foo-barbaz');
   t.equal(parsed.toString({ sep: false }), 'yum-somehash foo-barbaz');
   t.equal(parsed.toString({ sep: '\t' }), 'yum-somehash\tfoo-barbaz');
   t.end();
 });
 
-test('accepts Integrity-like as input', t => {
+tap('accepts Integrity-like as input', t => {
   const algorithm = 'sha512';
   const digest = hash(TEST_DATA, 'sha512');
   const sriLike = {
@@ -196,7 +196,7 @@ test('accepts Integrity-like as input', t => {
   t.end();
 });
 
-test('parses and groups multiple-entry strings', t => {
+tap('parses and groups multiple-entry strings', t => {
   const hashes = [
     `sha1-${hash(TEST_DATA, 'sha1')}`,
     `sha256-${hash(TEST_DATA, 'sha256')}`,
@@ -238,7 +238,7 @@ test('parses and groups multiple-entry strings', t => {
   t.end();
 });
 
-test('parses any whitespace as entry separators', t => {
+tap('parses any whitespace as entry separators', t => {
   const integrity = '\tsha512-foobarbaz \n\rsha384-bazbarfoo\n         \t  \t\t sha256-foo';
   t.same(
     ssri.parse(integrity),
@@ -273,7 +273,7 @@ test('parses any whitespace as entry separators', t => {
   t.end();
 });
 
-test('discards invalid format entries', t => {
+tap('discards invalid format entries', t => {
   const missingDash = 'thisisbad';
   const missingAlgorithm = '-deadbeef';
   const missingDigest = 'sha512-';
@@ -286,7 +286,7 @@ test('discards invalid format entries', t => {
   t.end();
 });
 
-test('trims whitespace from either end', t => {
+tap('trims whitespace from either end', t => {
   const integrity = `      sha512-${hash(TEST_DATA, 'sha512')}    `;
   t.same(
     ssri.parse(integrity),
@@ -305,7 +305,7 @@ test('trims whitespace from either end', t => {
   t.end();
 });
 
-test('supports strict spec parsing', t => {
+tap('supports strict spec parsing', t => {
   const valid = `sha512-${hash(TEST_DATA, 'sha512')}`;
   const badAlgorithm = `sha1-${hash(TEST_DATA, 'sha1')}`;
   const badBase64 = 'sha512-@#$@%#$';
@@ -322,7 +322,7 @@ test('supports strict spec parsing', t => {
   t.end();
 });
 
-test('does not allow weird stuff in sri', t => {
+tap('does not allow weird stuff in sri', t => {
   const badInt = 'mdc2\u0000/../../../hello_what_am_I_doing_here-Juwtg9UFssfrRfwsXu+n/Q==';
   const bad = ssri.parse(badInt);
   const badStrict = ssri.parse(badInt, { strict: true });

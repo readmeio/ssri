@@ -1,17 +1,17 @@
-const crypto = require('crypto');
-const fs = require('fs');
+import crypto from 'crypto';
+import fs from 'fs';
 
-const test = require('tap').test;
+import { test as tap } from 'tap';
 
-const ssri = require('../src');
+import ssri from '../src';
 
 const TEST_DATA = fs.readFileSync(__filename);
 
-function hash(data, algorithm) {
+function hash(data: any, algorithm: string) {
   return crypto.createHash(algorithm).update(data).digest('base64');
 }
 
-test('fromHex', t => {
+tap('fromHex', t => {
   t.equal(
     ssri.fromHex('deadbeef', 'sha1').toString(),
     'sha1-3q2+7w==',
@@ -25,7 +25,7 @@ test('fromHex', t => {
   t.end();
 });
 
-test('fromData', t => {
+tap('fromData', t => {
   t.equal(
     ssri.fromData(TEST_DATA).toString(),
     `sha512-${hash(TEST_DATA, 'sha512')}`,

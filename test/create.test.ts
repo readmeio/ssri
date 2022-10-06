@@ -1,8 +1,8 @@
-const test = require('tap').test;
+import { test as tap } from 'tap';
 
-const ssri = require('../src');
+import ssri from '../src';
 
-test('works just like from', function (t) {
+tap('works just like from', t => {
   const integrity = ssri.fromData('hi');
   const integrityCreate = ssri.create().update('hi').digest();
 
@@ -11,7 +11,7 @@ test('works just like from', function (t) {
   t.end();
 });
 
-test('pass in an algo multiple times', t => {
+tap('pass in an algo multiple times', t => {
   t.match(
     ssri.fromData('hi', {
       algorithms: ['sha512', 'sha512'],
@@ -61,7 +61,7 @@ test('pass in an algo multiple times', t => {
   t.end();
 });
 
-test('can pass options', function (t) {
+tap('can pass options', function (t) {
   const integrity = ssri
     .create({ algorithms: ['sha256', 'sha384'] })
     .update('hi')

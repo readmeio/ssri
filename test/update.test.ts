@@ -1,6 +1,6 @@
-const t = require('tap');
+import t from 'tap';
 
-const ssri = require('../src');
+import ssri from '../src';
 
 const i = ssri.parse('sha1-foo');
 const o = ssri.parse('sha512-bar');

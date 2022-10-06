@@ -1,8 +1,8 @@
-const test = require('tap').test;
+import { test as tap } from 'tap';
 
-const ssri = require('../src');
+import ssri from '../src';
 
-test('toString()', t => {
+tap('toString()', t => {
   const sri = ssri.parse('sha1-eUN/Xt2hP5wGabl43XqQZt0gWfE= sha256-Qhx213Vjr6GRSEawEL0WTzlb00whAuXpngy5zxc8HYc=');
   t.equal(
     sri.toString(),
@@ -22,14 +22,14 @@ test('toString()', t => {
   t.end();
 });
 
-test('toJSON()', t => {
+tap('toJSON()', t => {
   const sri = ssri.parse('sha512-foo sha256-bar!');
   t.equal(sri.toJSON(), 'sha512-foo sha256-bar!', 'integrity objects from ssri.parse() can use toJSON()');
   t.equal(sri.sha512[0].toJSON(), 'sha512-foo', 'hash objects should toJSON also');
   t.end();
 });
 
-test('concat()', t => {
+tap('concat()', t => {
   const sri = ssri.parse('sha512-foo');
   t.equal(sri.concat('sha512-bar').toString(), 'sha512-foo sha512-bar', 'concatenates with a string');
   t.equal(
@@ -68,7 +68,7 @@ test('concat()', t => {
   t.end();
 });
 
-test('match()', t => {
+tap('match()', t => {
   const sri = ssri.parse('sha1-foo sha512-bar');
   t.match(
     sri.match('sha1-foo'),
@@ -116,7 +116,7 @@ test('match()', t => {
   t.end();
 });
 
-test('pickAlgorithm()', t => {
+tap('pickAlgorithm()', t => {
   const sri = ssri.parse('sha1-foo sha512-bar sha384-baz');
   t.equal(sri.pickAlgorithm(), 'sha512', 'picked best algorithm');
   t.equal(
@@ -126,7 +126,7 @@ test('pickAlgorithm()', t => {
   );
   t.equal(
     sri.pickAlgorithm({
-      pickAlgorithm: (a, b) => 'sha384',
+      pickAlgorithm: () => 'sha384',
     }),
     'sha384',
     'custom pickAlgorithm function accepted'
@@ -134,7 +134,7 @@ test('pickAlgorithm()', t => {
   t.end();
 });
 
-test('hexDigest()', t => {
+tap('hexDigest()', t => {
   t.equal(
     ssri.parse('sha512-foo').hexDigest(),
     Buffer.from('foo', 'base64').toString('hex'),
@@ -148,14 +148,15 @@ test('hexDigest()', t => {
   t.end();
 });
 
-test('isIntegrity and isHash', t => {
+tap('isIntegrity and isHash', t => {
   const sri = ssri.parse('sha512-bar');
   t.ok(sri.isIntegrity, 'full sri has !!.isIntegrity');
   t.ok(sri.sha512[0].isHash, 'sri hash has !!.isHash');
   t.end();
 });
 
-test('semi-private', t => {
+tap('semi-private', t => {
+  // @ts-expect-error Integrity class is private and shouldn't be accessible here.
   t.equal(ssri.Integrity, undefined, 'Integrity class is module-private.');
   t.end();
 });

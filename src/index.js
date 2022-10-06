@@ -1,14 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable object-shorthand */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-param-reassign */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable unicorn/no-unsafe-regex */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 const crypto = require('crypto');
-
-const MiniPass = require('minipass');
 
 const SPEC_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 
@@ -16,6 +6,7 @@ const SPEC_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 // rather than [a-z0-9].
 const BASE64_REGEX = /^[a-z0-9+/]+(?:=?=?)$/i;
 const SRI_REGEX = /^([a-z0-9]+)-([^?]+)([?\S*]*)$/;
+// eslint-disable-next-line unicorn/no-unsafe-regex
 const STRICT_SRI_REGEX = /^([a-z0-9]+)-([A-Za-z0-9+/=]{44,88})(\?[\x21-\x7E]*)?$/;
 const VCHAR_REGEX = /^[\x21-\x7E]+$/;
 
@@ -39,6 +30,7 @@ class Hash {
   }
 
   constructor(hash, opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     const strict = !!opts.strict;
     this.source = hash.trim();
@@ -76,6 +68,7 @@ class Hash {
   }
 
   toString(opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     if (opts.strict) {
       // Strict mode enforces the standard as close to the foot of the
@@ -120,6 +113,7 @@ class Integrity {
   }
 
   toString(opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     let sep = opts.sep || ' ';
     if (opts.strict) {
@@ -128,6 +122,8 @@ class Integrity {
     }
     return Object.keys(this)
       .map(k => {
+        if (typeof this[k] === 'function') return false;
+
         return this[k]
           .map(hash => {
             return Hash.prototype.toString.call(hash, opts);
@@ -140,6 +136,7 @@ class Integrity {
   }
 
   concat(integrity, opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     const other = typeof integrity === 'string' ? integrity : stringify(integrity, opts);
     return parse(`${this.toString(opts)} ${other}`, opts);
@@ -152,9 +149,11 @@ class Integrity {
   // add additional hashes to an integrity value, but prevent
   // *changing* an existing integrity hash.
   merge(integrity, opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     const other = parse(integrity, opts);
-    for (const algo in other) {
+
+    Object.keys(other).forEach(algo => {
       if (this[algo]) {
         if (!this[algo].find(hash => other[algo].find(otherhash => hash.digest === otherhash.digest))) {
           throw new Error('hashes do not match, cannot update integrity');
@@ -162,10 +161,11 @@ class Integrity {
       } else {
         this[algo] = other[algo];
       }
-    }
+    });
   }
 
   match(integrity, opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     const other = parse(integrity, opts);
     if (!other) {
@@ -181,6 +181,7 @@ class Integrity {
   }
 
   pickAlgorithm(opts) {
+    // eslint-disable-next-line no-param-reassign
     opts = ssriOpts(opts);
     const pickAlgorithm = opts.pickAlgorithm;
     const keys = Object.keys(this);
@@ -195,6 +196,8 @@ function parse(sri, opts) {
   if (!sri) {
     return null;
   }
+
+  // eslint-disable-next-line no-param-reassign
   opts = ssriOpts(opts);
   if (typeof sri === 'string') {
     return _parse(sri, opts);
@@ -232,6 +235,7 @@ function _parse(integrity, opts) {
 
 module.exports.stringify = stringify;
 function stringify(obj, opts) {
+  // eslint-disable-next-line no-param-reassign
   opts = ssriOpts(opts);
   if (obj.algorithm && obj.digest) {
     return Hash.prototype.toString.call(obj, opts);
@@ -244,6 +248,7 @@ function stringify(obj, opts) {
 
 module.exports.fromHex = fromHex;
 function fromHex(hexDigest, algorithm, opts) {
+  // eslint-disable-next-line no-param-reassign
   opts = ssriOpts(opts);
   const optString = getOptString(opts.options);
   return parse(`${algorithm}-${Buffer.from(hexDigest, 'hex').toString('base64')}${optString}`, opts);
@@ -251,6 +256,7 @@ function fromHex(hexDigest, algorithm, opts) {
 
 module.exports.fromData = fromData;
 function fromData(data, opts) {
+  // eslint-disable-next-line no-param-reassign
   opts = ssriOpts(opts);
   const algorithms = opts.algorithms;
   const optString = getOptString(opts.options);
@@ -273,7 +279,9 @@ function fromData(data, opts) {
 
 module.exports.checkData = checkData;
 function checkData(data, sri, opts) {
+  // eslint-disable-next-line no-param-reassign
   opts = ssriOpts(opts);
+  // eslint-disable-next-line no-param-reassign
   sri = parse(sri, opts);
   if (!sri || !Object.keys(sri).length) {
     if (opts.error) {
@@ -312,6 +320,7 @@ function checkData(data, sri, opts) {
 
 module.exports.create = createIntegrity;
 function createIntegrity(opts) {
+  // eslint-disable-next-line no-param-reassign
   opts = ssriOpts(opts);
   const algorithms = opts.algorithms;
   const optString = getOptString(opts.options);
@@ -319,11 +328,11 @@ function createIntegrity(opts) {
   const hashes = algorithms.map(crypto.createHash);
 
   return {
-    update: function (chunk, enc) {
+    update(chunk, enc) {
       hashes.forEach(h => h.update(chunk, enc));
       return this;
     },
-    digest: function (enc) {
+    digest(enc) {
       const integrity = algorithms.reduce((acc, algo) => {
         const digest = hashes.shift().digest('base64');
         const hash = new Hash(`${algo}-${digest}${optString}`, opts);
