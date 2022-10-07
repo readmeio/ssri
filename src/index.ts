@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 const SPEC_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 
@@ -9,10 +9,23 @@ const BASE64_REGEX = /^[a-z0-9+/]+(?:=?=?)$/i;
 const STRICT_SRI_REGEX = /^([a-z0-9]+)-([A-Za-z0-9+/=]{44,88})(\?[\x21-\x7E]*)?$/;
 const VCHAR_REGEX = /^[\x21-\x7E]+$/;
 
-const getOptString = options => (!options || !options.length ? '' : `?${options.join('?')}`);
+const getOptString = (options: string[]) => (!options || !options.length ? '' : `?${options.join('?')}`);
+
+export type Options = {
+  algorithm?: string;
+  options?: string[];
+};
 
 class Hash {
-  constructor(hash) {
+  source: string;
+
+  digest: string;
+
+  algorithm: string;
+
+  options: string[];
+
+  constructor(hash: string) {
     this.source = hash.trim();
 
     // set default values so that we make V8 happy to
@@ -70,8 +83,7 @@ class Hash {
   }
 }
 
-module.exports.parse = parse;
-function parse(sri) {
+export function parse(sri: string) {
   if (!sri) {
     return null;
   }
@@ -79,8 +91,7 @@ function parse(sri) {
   return new Hash(sri);
 }
 
-module.exports.create = create;
-function create(data, opts) {
+export function create(data: string | Buffer, opts: Options = {}) {
   // eslint-disable-next-line no-param-reassign
   opts = {
     algorithm: 'sha512',
@@ -92,11 +103,10 @@ function create(data, opts) {
   const optString = getOptString(opts.options);
 
   const digest = crypto.createHash(algorithm).update(data).digest('base64');
-  return new Hash(`${algorithm}-${digest}${optString}`, opts);
+  return new Hash(`${algorithm}-${digest}${optString}`);
 }
 
-module.exports.verify = verify;
-function verify(data, sri) {
+export function verify(data: string | Buffer, sri: string | Hash) {
   try {
     if (typeof sri === 'object' && sri instanceof Hash) {
       // eslint-disable-next-line no-param-reassign

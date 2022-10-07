@@ -1,9 +1,9 @@
-const crypto = require('crypto');
-const fs = require('fs');
+import crypto from 'crypto';
+import fs from 'fs';
 
-const { expect } = require('chai');
+import { expect } from 'chai';
 
-const ssri = require('../src');
+import * as ssri from '../src';
 
 const TEST_DATA = fs.readFileSync(__filename);
 
@@ -37,13 +37,17 @@ describe('ssri', function () {
           .toString()
       ).to.equal(`sha256-${hash(TEST_DATA, 'sha256')}?foo?bar`);
     });
+
+    it('should support transforming a Hash object into a JSON string with `JSON.stringify`', function () {
+      expect(JSON.stringify(ssri.create(TEST_DATA))).to.equal(`"sha512-${hash(TEST_DATA, 'sha512')}"`);
+    });
   });
 
   describe('#parse', function () {
     it('should parse an integrity string', function () {
       const sha = hash(TEST_DATA, 'sha512');
       const integrity = `sha512-${sha}`;
-      expect(ssri.parse(integrity)).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).to.deep.equal({
         source: integrity,
         digest: sha,
         algorithm: 'sha512',
@@ -54,7 +58,7 @@ describe('ssri', function () {
     it('should parse options from integrity string', function () {
       const sha = hash(TEST_DATA, 'sha512');
       const integrity = `sha512-${sha}?one?two?three`;
-      expect(ssri.parse(integrity)).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).to.deep.equal({
         source: integrity,
         digest: sha,
         algorithm: 'sha512',
@@ -65,14 +69,14 @@ describe('ssri', function () {
     it('should omit unsupported algos', function () {
       const xxx = new Array(50).join('x');
 
-      expect(ssri.parse(`foo-${xxx}`)).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(`foo-${xxx}`)))).to.deep.equal({
         source: `foo-${xxx}`,
         algorithm: '',
         digest: '',
         options: [],
       });
 
-      expect(ssri.parse(`sha512-${xxx}`)).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(`sha512-${xxx}`)))).to.deep.equal({
         source: `sha512-${xxx}`,
         algorithm: 'sha512',
         digest: xxx,
@@ -92,7 +96,7 @@ describe('ssri', function () {
 
     it('should trim whitespace from either end', function () {
       const integrity = `      sha512-${hash(TEST_DATA, 'sha512')}    `;
-      expect(ssri.parse(integrity)).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).to.deep.equal({
         source: integrity.trim(),
         algorithm: 'sha512',
         digest: hash(TEST_DATA, 'sha512'),
