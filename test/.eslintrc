@@ -1,8 +1,9 @@
 {
-  "plugins": [
-    "tap"
-  ],
-  "extends": "plugin:tap/recommended",
+  "extends": "@readme/eslint-config/testing-mocha",
+  // "plugins": [
+  //   "tap"
+  // ],
+  // "extends": "plugin:tap/recommended",
   "rules": {
     "consistent-return": "off"
   }
