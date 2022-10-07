@@ -1,9 +1,11 @@
-# ssri [![npm version](https://img.shields.io/npm/v/@readme/ssri.svg)](https://npm.im/ssri) [![license](https://img.shields.io/npm/l/@readme/ssri)](https://npm.im/ssri) [![Travis](https://img.shields.io/travis/npm/ssri.svg)](https://travis-ci.org/npm/ssri)
+# @readme/ssri
 
 [`ssri`](https://github.com/npm/ssri), short for Standard Subresource
 Integrity, is a Node.js utility for parsing, manipulating, serializing,
 generating, and verifying [Subresource
 Integrity](https://w3c.github.io/webappsec/specs/subresourceintegrity/) hashes.
+
+[![Build](https://github.com/readmeio/ssri/workflows/CI/badge.svg)](https://github.com/readmeio/ssri/) [![](https://img.shields.io/npm/v/@readme/ssri)](https://npm.im/@readme/ssri)
 
 ## Install
 
@@ -17,6 +19,7 @@ Integrity](https://w3c.github.io/webappsec/specs/subresourceintegrity/) hashes.
   * [`parse`](#parse)
   * [`create`](#create)
   * [`verify`](#verify)
+* [Differences from `ssri`](#differences-from-ssri)
 
 ### Example
 
@@ -107,3 +110,16 @@ ssri.verify(data, ssri.create(data)) // -> true
 ssri.verify(data, 'sha256-l981iLWj8kurw4UbNy8Lpxqdzd7UOxS50Glhv8FwfZ0')
 ssri.verify(data, 'sha1-BaDDigEST') // -> false
 ```
+
+#### <a name="differences-from-ssri"></a> Differences from `ssri`
+
+* TypeScript first.
+* Streams are not supported.
+* Zero non-`crypto` dependencies.
+* Library offerings have been heavily paired down to only three methods.
+* `checkData` has been renamed to `verify`.
+  * `verify` now only returns a boolean.
+* `fromData` has been renamed to to `create`.
+  * Generating or parsing multiple integrity hashes is not supported.
+* `ssri`'s `strict` mode is now the default and only mode.
+* The `Integrity` class is no more and `parse`, `create` will generate a `Hash` object containing your single hash.
