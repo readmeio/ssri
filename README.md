@@ -1,8 +1,7 @@
 # @readme/ssri
 
 [`ssri`](https://github.com/npm/ssri), short for Standard Subresource
-Integrity, is a Node.js utility for parsing, manipulating, serializing,
-generating, and verifying [Subresource
+Integrity, is a Node.js utility for parsing generating, and verifying [Subresource
 Integrity](https://w3c.github.io/webappsec/specs/subresourceintegrity/) hashes.
 
 [![Build](https://github.com/readmeio/ssri/workflows/CI/badge.svg)](https://github.com/readmeio/ssri/) [![](https://img.shields.io/npm/v/@readme/ssri)](https://npm.im/@readme/ssri)
