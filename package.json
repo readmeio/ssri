@@ -1,64 +1,43 @@
 {
-  "name": "ssri",
-  "version": "9.0.1",
-  "description": "Standard Subresource Integrity library -- parses, serializes, generates, and verifies integrity metadata according to the SRI spec.",
-  "main": "lib/index.js",
-  "files": [
-    "bin/",
-    "lib/"
-  ],
-  "scripts": {
-    "prerelease": "npm t",
-    "postrelease": "npm publish",
-    "posttest": "npm run lint",
-    "test": "tap",
-    "coverage": "tap",
-    "lint": "eslint \"**/*.js\"",
-    "postlint": "template-oss-check",
-    "template-oss-apply": "template-oss-apply --force",
-    "lintfix": "npm run lint -- --fix",
-    "snap": "tap"
-  },
-  "tap": {
-    "check-coverage": true,
-    "nyc-arg": [
-      "--exclude",
-      "tap-snapshots/**"
-    ]
+  "name": "@readme/ssri",
+  "version": "1.0.0",
+  "description": "Standard Subresource Integrity library -- parses, generates, and verifies integrity metadata according to the SRI spec.",
+  "license": "MIT",
+  "author": "ReadMe <support@readme.io> (https://readme.com)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=14"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/npm/ssri.git"
+    "url": "https://github.com/readmeio/ssri.git"
   },
-  "keywords": [
-    "w3c",
-    "web",
-    "security",
-    "integrity",
-    "checksum",
-    "hashing",
-    "subresource integrity",
-    "sri",
-    "sri hash",
-    "sri string",
-    "sri generator",
-    "html"
-  ],
-  "author": "GitHub Inc.",
-  "license": "ISC",
-  "dependencies": {
-    "minipass": "^3.1.1"
+  "bugs": {
+    "url": "https://github.com/readmeio/ssri/issues"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .js,.ts",
+    "prebuild": "rm -rf dist/",
+    "prepack": "npm run build",
+    "pretest": "npm run lint",
+    "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
+    "release": "npx conventional-changelog-cli -i CHANGELOG.md -s",
+    "test": "nyc mocha \"test/**/*.test.ts\""
   },
   "devDependencies": {
-    "@npmcli/eslint-config": "^3.0.1",
-    "@npmcli/template-oss": "4.4.4",
-    "tap": "^16.0.1"
+    "@readme/eslint-config": "^10.1.0",
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.8.3",
+    "chai": "^4.3.6",
+    "eslint": "^8.14.0",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.6.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
   },
-  "engines": {
-    "node": "^14.17.0 || ^16.13.0 || >=18.0.0"
-  },
-  "templateOSS": {
-    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
-    "version": "4.4.4"
-  }
+  "prettier": "@readme/eslint-config/prettier"
 }

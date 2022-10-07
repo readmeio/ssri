@@ -1,17 +1,26 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
 version: 2
-
 updates:
-  - package-ecosystem: npm
-    directory: /
+  - package-ecosystem: github-actions
+    directory: "/"
     schedule:
-      interval: daily
-    allow:
-      - dependency-type: direct
-    versioning-strategy: increase-if-necessary
-    commit-message:
-      prefix: deps
-      prefix-development: chore
+      interval: monthly
+    reviewers:
+      - erunion
     labels:
-      - "Dependencies"
+      - dependencies
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 10
+    reviewers:
+      - erunion
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
