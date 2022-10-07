@@ -1,19 +1,12 @@
-# This file is automatically added by @npmcli/template-oss. Do not edit.
-
-name: CodeQL
+name: "CodeQL"
 
 on:
   push:
-    branches:
-      - main
-      - latest
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-      - latest
+    branches: [ main ]
   schedule:
-    # "At 10:00 UTC (03:00 PT) on Monday" https://crontab.guru/#0_10_*_*_1
-    - cron: "0 10 * * 1"
+    - cron: '0 0 1 * *'
 
 jobs:
   analyze:
@@ -23,16 +16,20 @@ jobs:
       actions: read
       contents: read
       security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Git User
-        run: |
-          git config --global user.email "npm-cli+bot@github.com"
-          git config --global user.name "npm CLI robot"
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: javascript
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
