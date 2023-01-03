@@ -11,10 +11,10 @@ const VCHAR_REGEX = /^[\x21-\x7E]+$/;
 
 const getOptString = (options: string[]) => (!options || !options.length ? '' : `?${options.join('?')}`);
 
-export type Options = {
+export interface Options {
   algorithm?: string;
   options?: string[];
-};
+}
 
 class Hash {
   source: string;
