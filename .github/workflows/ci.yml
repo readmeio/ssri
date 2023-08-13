@@ -41,7 +41,6 @@ jobs:
         node:
           - 16
           - 18
-          - 19
           - 20
 
     steps:
@@ -68,4 +67,4 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npx mocha
+      - run: npx vitest

@@ -5,7 +5,6 @@ const SPEC_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 // TODO: this should really be a hardcoded list of algorithms we support,
 // rather than [a-z0-9].
 const BASE64_REGEX = /^[a-z0-9+/]+(?:=?=?)$/i;
-// eslint-disable-next-line unicorn/no-unsafe-regex
 const STRICT_SRI_REGEX = /^([a-z0-9]+)-([A-Za-z0-9+/=]{44,88})(\?[\x21-\x7E]*)?$/;
 const VCHAR_REGEX = /^[\x21-\x7E]+$/;
 

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 
-import { expect } from 'chai';
+import { describe, beforeEach, it, expect } from 'vitest';
 
 import * as ssri from '../src';
 
@@ -14,17 +14,15 @@ function hash(data, algorithm) {
 describe('ssri', function () {
   describe('#create', function () {
     it('should generate a sha512 hash object from Buffer data', function () {
-      expect(ssri.create(TEST_DATA).toString()).to.equal(`sha512-${hash(TEST_DATA, 'sha512')}`);
+      expect(ssri.create(TEST_DATA).toString()).toBe(`sha512-${hash(TEST_DATA, 'sha512')}`);
     });
 
     it('should generate a sha512 hash object from String data', function () {
-      expect(ssri.create(TEST_DATA.toString('utf8')).toString()).to.equal(`sha512-${hash(TEST_DATA, 'sha512')}`);
+      expect(ssri.create(TEST_DATA.toString('utf8')).toString()).toBe(`sha512-${hash(TEST_DATA, 'sha512')}`);
     });
 
     it('should generate a sha256 hash object with `opts.algorithm`', function () {
-      expect(ssri.create(TEST_DATA, { algorithm: 'sha256' }).toString()).to.equal(
-        `sha256-${hash(TEST_DATA, 'sha256')}`
-      );
+      expect(ssri.create(TEST_DATA, { algorithm: 'sha256' }).toString()).toBe(`sha256-${hash(TEST_DATA, 'sha256')}`);
     });
 
     it('should be able to add options to a hash with `opts.options', function () {
@@ -34,12 +32,12 @@ describe('ssri', function () {
             algorithm: 'sha256',
             options: ['foo', 'bar'],
           })
-          .toString()
-      ).to.equal(`sha256-${hash(TEST_DATA, 'sha256')}?foo?bar`);
+          .toString(),
+      ).toBe(`sha256-${hash(TEST_DATA, 'sha256')}?foo?bar`);
     });
 
     it('should support transforming a Hash object into a JSON string with `JSON.stringify`', function () {
-      expect(JSON.stringify(ssri.create(TEST_DATA))).to.equal(`"sha512-${hash(TEST_DATA, 'sha512')}"`);
+      expect(JSON.stringify(ssri.create(TEST_DATA))).toBe(`"sha512-${hash(TEST_DATA, 'sha512')}"`);
     });
   });
 
@@ -47,7 +45,7 @@ describe('ssri', function () {
     it('should parse an integrity string', function () {
       const sha = hash(TEST_DATA, 'sha512');
       const integrity = `sha512-${sha}`;
-      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).toStrictEqual({
         source: integrity,
         digest: sha,
         algorithm: 'sha512',
@@ -58,7 +56,7 @@ describe('ssri', function () {
     it('should parse options from integrity string', function () {
       const sha = hash(TEST_DATA, 'sha512');
       const integrity = `sha512-${sha}?one?two?three`;
-      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).toStrictEqual({
         source: integrity,
         digest: sha,
         algorithm: 'sha512',
@@ -69,14 +67,14 @@ describe('ssri', function () {
     it('should omit unsupported algos', function () {
       const xxx = new Array(50).join('x');
 
-      expect(Object.fromEntries(Object.entries(ssri.parse(`foo-${xxx}`)))).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(`foo-${xxx}`)))).toStrictEqual({
         source: `foo-${xxx}`,
         algorithm: '',
         digest: '',
         options: [],
       });
 
-      expect(Object.fromEntries(Object.entries(ssri.parse(`sha512-${xxx}`)))).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(`sha512-${xxx}`)))).toStrictEqual({
         source: `sha512-${xxx}`,
         algorithm: 'sha512',
         digest: xxx,
@@ -89,14 +87,14 @@ describe('ssri', function () {
       const missingAlgorithm = '-deadbeef';
       const missingDigest = 'sha512-';
 
-      expect(ssri.parse(missingDash).toString()).to.be.empty;
-      expect(ssri.parse(missingAlgorithm).toString()).to.be.empty;
-      expect(ssri.parse(missingDigest).toString()).to.be.empty;
+      expect(ssri.parse(missingDash).toString()).toBeFalsy();
+      expect(ssri.parse(missingAlgorithm).toString()).toBeFalsy();
+      expect(ssri.parse(missingDigest).toString()).toBeFalsy();
     });
 
     it('should trim whitespace from either end', function () {
       const integrity = `      sha512-${hash(TEST_DATA, 'sha512')}    `;
-      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).to.deep.equal({
+      expect(Object.fromEntries(Object.entries(ssri.parse(integrity)))).toStrictEqual({
         source: integrity.trim(),
         algorithm: 'sha512',
         digest: hash(TEST_DATA, 'sha512'),
@@ -110,47 +108,47 @@ describe('ssri', function () {
       const badBase64 = 'sha512-@#$@%#$';
       const badOpts = `${valid}?\x01\x02`;
 
-      expect(ssri.parse(badAlgorithm).toString()).to.be.empty;
-      expect(ssri.parse(badBase64).toString()).to.be.empty;
-      expect(ssri.parse(badOpts).toString()).to.be.empty;
+      expect(ssri.parse(badAlgorithm).toString()).toBeFalsy();
+      expect(ssri.parse(badBase64).toString()).toBeFalsy();
+      expect(ssri.parse(badOpts).toString()).toBeFalsy();
     });
 
     it('should not allow weird stuff in sri', function () {
       const badInt = 'mdc2\u0000/../../../hello_what_am_I_doing_here-Juwtg9UFssfrRfwsXu+n/Q==';
 
-      expect(ssri.parse(badInt).toString()).to.be.empty;
+      expect(ssri.parse(badInt).toString()).toBeFalsy();
     });
   });
 
   describe('#verify', function () {
     let sri;
 
-    before(function () {
+    beforeEach(function () {
       sri = ssri.parse(`sha512-${hash(TEST_DATA, 'sha512')}`);
     });
 
     it('should verify Buffer data', function () {
-      expect(ssri.verify(TEST_DATA, sri)).to.be.true;
+      expect(ssri.verify(TEST_DATA, sri)).toBe(true);
     });
 
     it('should verify String data', function () {
-      expect(ssri.verify(TEST_DATA.toString('utf8'), sri)).to.be.true;
+      expect(ssri.verify(TEST_DATA.toString('utf8'), sri)).toBe(true);
     });
 
     it('should return false when verification fails', function () {
-      expect(ssri.verify('nope', sri)).to.be.false;
+      expect(ssri.verify('nope', sri)).toBe(false);
     });
 
     it('should return false on an invalid sri hash', function () {
-      expect(ssri.verify('nope', 'sha512-nope')).to.be.false;
+      expect(ssri.verify('nope', 'sha512-nope')).toBe(false);
     });
 
     it('should return false on garbage sri input', function () {
-      expect(ssri.verify('nope', 'garbage')).to.be.false;
+      expect(ssri.verify('nope', 'garbage')).toBe(false);
     });
 
     it('should return false on empty sri input', function () {
-      expect(ssri.verify('nope', '')).to.be.false;
+      expect(ssri.verify('nope', '')).toBe(false);
     });
   });
 });
