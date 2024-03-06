@@ -90,7 +90,7 @@ export function parse(sri: string) {
   return new Hash(sri);
 }
 
-export function create(data: string | Buffer, opts: Options = {}) {
+export function create(data: Buffer | string, opts: Options = {}) {
   // eslint-disable-next-line no-param-reassign
   opts = {
     algorithm: 'sha512',
@@ -105,7 +105,7 @@ export function create(data: string | Buffer, opts: Options = {}) {
   return new Hash(`${algorithm}-${digest}${optString}`);
 }
 
-export function verify(data: string | Buffer, sri: string | Hash) {
+export function verify(data: Buffer | string, sri: Hash | string) {
   try {
     if (typeof sri === 'object' && sri instanceof Hash) {
       // eslint-disable-next-line no-param-reassign
