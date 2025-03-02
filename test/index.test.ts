@@ -87,9 +87,9 @@ describe('ssri', function () {
       const missingAlgorithm = '-deadbeef';
       const missingDigest = 'sha512-';
 
-      expect(ssri.parse(missingDash).toString()).toBeFalsy();
-      expect(ssri.parse(missingAlgorithm).toString()).toBeFalsy();
-      expect(ssri.parse(missingDigest).toString()).toBeFalsy();
+      expect(ssri.parse(missingDash).toString()).toBe('');
+      expect(ssri.parse(missingAlgorithm).toString()).toBe('');
+      expect(ssri.parse(missingDigest).toString()).toBe('');
     });
 
     it('should trim whitespace from either end', function () {
@@ -108,15 +108,15 @@ describe('ssri', function () {
       const badBase64 = 'sha512-@#$@%#$';
       const badOpts = `${valid}?\x01\x02`;
 
-      expect(ssri.parse(badAlgorithm).toString()).toBeFalsy();
-      expect(ssri.parse(badBase64).toString()).toBeFalsy();
-      expect(ssri.parse(badOpts).toString()).toBeFalsy();
+      expect(ssri.parse(badAlgorithm).toString()).toBe('');
+      expect(ssri.parse(badBase64).toString()).toBe('');
+      expect(ssri.parse(badOpts).toString()).toBe('');
     });
 
     it('should not allow weird stuff in sri', function () {
       const badInt = 'mdc2\u0000/../../../hello_what_am_I_doing_here-Juwtg9UFssfrRfwsXu+n/Q==';
 
-      expect(ssri.parse(badInt).toString()).toBeFalsy();
+      expect(ssri.parse(badInt).toString()).toBe('');
     });
   });
 
