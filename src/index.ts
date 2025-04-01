@@ -123,7 +123,6 @@ export function verify(data: Buffer | string, sri: Hash | string) {
     const newSri = parse(`${algorithm}-${digest}`);
 
     return sri.toString() === newSri.toString();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     // `crypto.createHash()` will throw errors if `algorithm` is invalid which will happen if we're
     // supplied with an invalid or corrupt hash. Since we just want this method to only verify if
