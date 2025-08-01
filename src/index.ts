@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 const SPEC_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 
@@ -77,7 +77,7 @@ class Hash {
       return '';
     }
 
-    const options = this.options && this.options.length ? `?${this.options.join('?')}` : '';
+    const options = this.options?.length ? `?${this.options.join('?')}` : '';
     return `${this.algorithm}-${this.digest}${options}`;
   }
 }
@@ -91,15 +91,8 @@ export function parse(sri: string) {
 }
 
 export function create(data: Buffer | string, opts: Options = {}) {
-  // eslint-disable-next-line no-param-reassign
-  opts = {
-    algorithm: 'sha512',
-    options: [],
-    ...opts,
-  };
-
-  const algorithm = opts.algorithm;
-  const optString = getOptString(opts.options);
+  const algorithm = opts.algorithm || 'sha512';
+  const optString = getOptString(opts.options || []);
 
   const digest = crypto.createHash(algorithm).update(data).digest('base64');
   return new Hash(`${algorithm}-${digest}${optString}`);
@@ -107,18 +100,19 @@ export function create(data: Buffer | string, opts: Options = {}) {
 
 export function verify(data: Buffer | string, sri: Hash | string) {
   try {
+    let currSri: Hash | string = sri;
     if (typeof sri === 'object' && sri instanceof Hash) {
       // eslint-disable-next-line no-param-reassign
-      sri = sri.toString();
+      currSri = sri.toString();
     }
 
     // eslint-disable-next-line no-param-reassign
-    sri = parse(sri);
-    if (!sri) {
+    currSri = parse(currSri as string);
+    if (!currSri) {
       return false;
     }
 
-    const algorithm = sri.algorithm;
+    const algorithm = currSri.algorithm;
     const digest = crypto.createHash(algorithm).update(data).digest('base64');
     const newSri = parse(`${algorithm}-${digest}`);
 
