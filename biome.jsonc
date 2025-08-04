@@ -11,11 +11,5 @@
       "project": "all",
       "test": "all",
     },
-    // "rules": {
-    //   "suspicious": {
-    //     // This library makes fetch requests in the browser and needs to be able to set cookies.
-    //     "noDocumentCookie": "off",
-    //   },
-    // },
   },
 }
