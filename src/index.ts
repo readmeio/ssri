@@ -117,7 +117,7 @@ export function verify(data: Buffer | string, sri: Hash | string) {
     const newSri = parse(`${algorithm}-${digest}`);
 
     return sri.toString() === newSri.toString();
-  } catch (err) {
+  } catch {
     // `crypto.createHash()` will throw errors if `algorithm` is invalid which will happen if we're
     // supplied with an invalid or corrupt hash. Since we just want this method to only verify if
     // two given hashes match, we don't want to throw if that happens.
