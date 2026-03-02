@@ -11,5 +11,17 @@
       "project": "all",
       "test": "all",
     },
+    "rules": {
+      "correctness": {
+        "useImportExtensions": {
+          "level": "off",
+          "options": {
+            // we need this since we cannot set `allowImportingTsExtensions` in our `tsconfig.json`.
+            // See: https://biomejs.dev/linter/rules/use-import-extensions/#forcejsextensions
+            "forceJsExtensions": true,
+          },
+        },
+      },
+    }
   },
 }
