@@ -82,7 +82,7 @@ class Hash {
   }
 }
 
-export function parse(sri: string) {
+export function parse(sri: string): Hash | null {
   if (!sri) {
     return null;
   }
@@ -100,14 +100,14 @@ export function create(data: Buffer | string, opts: Options = {}) {
 
 export function verify(data: Buffer | string, sri: Hash | string) {
   try {
-    let currSri: Hash | string = sri;
+    let strSri: string;
     if (typeof sri === 'object' && sri instanceof Hash) {
-      // eslint-disable-next-line no-param-reassign
-      currSri = sri.toString();
+      strSri = sri.toString();
+    } else {
+      strSri = sri;
     }
 
-    // eslint-disable-next-line no-param-reassign
-    currSri = parse(currSri as string);
+    const currSri = parse(strSri);
     if (!currSri) {
       return false;
     }
@@ -116,7 +116,7 @@ export function verify(data: Buffer | string, sri: Hash | string) {
     const digest = crypto.createHash(algorithm).update(data).digest('base64');
     const newSri = parse(`${algorithm}-${digest}`);
 
-    return sri.toString() === newSri.toString();
+    return newSri && sri.toString() === newSri.toString();
   } catch {
     // `crypto.createHash()` will throw errors if `algorithm` is invalid which will happen if we're
     // supplied with an invalid or corrupt hash. Since we just want this method to only verify if
