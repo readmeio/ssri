@@ -8,7 +8,7 @@ const BASE64_REGEX = /^[a-z0-9+/]+(?:=?=?)$/i;
 const STRICT_SRI_REGEX = /^([a-z0-9]+)-([A-Za-z0-9+/=]{44,88})(\?[\x21-\x7E]*)?$/;
 const VCHAR_REGEX = /^[\x21-\x7E]+$/;
 
-const getOptString = (options: string[]) => (!options || !options.length ? '' : `?${options.join('?')}`);
+const getOptString = (options: string[]) => (!options?.length ? '' : `?${options.join('?')}`);
 
 export interface Options {
   algorithm?: string;
