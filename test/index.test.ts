@@ -65,7 +65,7 @@ describe('ssri', () => {
     });
 
     it('should omit unsupported algos', () => {
-      const xxx = new Array(50).join('x');
+      const xxx = Array.from({ length: 50 }, () => 'x').join('');
 
       expect(Object.fromEntries(Object.entries(ssri.parse(`foo-${xxx}`)))).toStrictEqual({
         source: `foo-${xxx}`,

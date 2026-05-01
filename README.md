@@ -12,38 +12,38 @@ Integrity](https://w3c.github.io/webappsec/specs/subresourceintegrity/) hashes.
 
 ## Table of Contents
 
-* [Example](#example)
-* [Features](#features)
-* [API](#api)
-  * [`parse`](#parse)
-  * [`create`](#create)
-  * [`verify`](#verify)
-* [Differences from `ssri`](#differences-from-ssri)
+- [Example](#example)
+- [Features](#features)
+- [API](#api)
+  - [`parse`](#parse)
+  - [`create`](#create)
+  - [`verify`](#verify)
+- [Differences from `ssri`](#differences-from-ssri)
 
 ### Example
 
 ```javascript
-const ssri = require('@readme/ssri')
+const ssri = require('@readme/ssri');
 
-const integrity = 'sha512-9KhgCRIx/AmzC8xqYJTZRrnO8OW2Pxyl2DIMZSBOr0oDvtEFyht3xpp71j/r/pAe1DM+JI/A+line3jUBgzQ7A==?foo'
+const integrity = 'sha512-9KhgCRIx/AmzC8xqYJTZRrnO8OW2Pxyl2DIMZSBOr0oDvtEFyht3xpp71j/r/pAe1DM+JI/A+line3jUBgzQ7A==?foo';
 
 // Parsing and serializing
-const parsed = ssri.parse(integrity)
-parsed.toString() // === integrity
+const parsed = ssri.parse(integrity);
+parsed.toString(); // === integrity
 
 // Sync data functions
-ssri.create(fs.readFileSync('./my-file')) // === parsed
-ssri.verify(fs.readFileSync('./my-file'), integrity) // => 'sha512'
+ssri.create(fs.readFileSync('./my-file')); // === parsed
+ssri.verify(fs.readFileSync('./my-file'), integrity); // => 'sha512'
 ```
 
 ### Features
 
-* Parses and stringifies SRI strings.
-* Generates SRI strings from raw data.
-* Strict standard compliance.
-* `?foo` metadata option support.
-* Small footprint: no dependencies, concise implementation.
-* Full test coverage.
+- Parses and stringifies SRI strings.
+- Generates SRI strings from raw data.
+- Strict standard compliance.
+- `?foo` metadata option support.
+- Small footprint: no dependencies, concise implementation.
+- Full test coverage.
 
 ### API
 
@@ -63,7 +63,7 @@ Parses an `sri` string into a `Hash` data structure.
 ##### Example
 
 ```javascript
-ssri.parse('sha512-9KhgCRIx/AmzC8xqYJTZRrnO8OW2Pxyl2DIMZSBOr0oDvtEFyht3xpp71j/r/pAe1DM+JI/A+line3jUBgzQ7A==?foo') // -> Hash object
+ssri.parse('sha512-9KhgCRIx/AmzC8xqYJTZRrnO8OW2Pxyl2DIMZSBOr0oDvtEFyht3xpp71j/r/pAe1DM+JI/A+line3jUBgzQ7A==?foo'); // -> Hash object
 ```
 
 #### <a name="from-data"></a> `> ssri.create(data, [opts]) -> Integrity`
@@ -85,9 +85,9 @@ probably avoid if your integrity strings are meant to be used with browsers.
 
 ```javascript
 const integrityObj = ssri.create('foobarbaz', {
-  algorithm: 'sha256'
-})
-integrity.toString('\n')
+  algorithm: 'sha256',
+});
+integrity.toString('\n');
 // ->
 // sha256-l981iLWj8kurw4UbNy8Lpxqdzd7UOxS50Glhv8FwfZ0=
 ```
@@ -104,21 +104,21 @@ If verification succeeds, `verify` will return `true`, otherwise it will return
 ##### Example
 
 ```javascript
-const data = fs.readFileSync('index.js').toString()
-ssri.verify(data, ssri.create(data)) // -> true
-ssri.verify(data, 'sha256-l981iLWj8kurw4UbNy8Lpxqdzd7UOxS50Glhv8FwfZ0')
-ssri.verify(data, 'sha1-BaDDigEST') // -> false
+const data = fs.readFileSync('index.js').toString();
+ssri.verify(data, ssri.create(data)); // -> true
+ssri.verify(data, 'sha256-l981iLWj8kurw4UbNy8Lpxqdzd7UOxS50Glhv8FwfZ0');
+ssri.verify(data, 'sha1-BaDDigEST'); // -> false
 ```
 
 #### <a name="differences-from-ssri"></a> Differences from `ssri`
 
-* TypeScript first.
-* Streams are not supported.
-* Zero non-`crypto` dependencies.
-* Library offerings have been heavily paired down to only three methods.
-* `checkData` has been renamed to `verify`.
-  * `verify` now only returns a boolean.
-* `fromData` has been renamed to to `create`.
-  * Generating or parsing multiple integrity hashes is not supported.
-* `ssri`'s `strict` mode is now the default and only mode.
-* The `Integrity` class is no more and `parse`, `create` will generate a `Hash` object containing your single hash.
+- TypeScript first.
+- Streams are not supported.
+- Zero non-`crypto` dependencies.
+- Library offerings have been heavily paired down to only three methods.
+- `checkData` has been renamed to `verify`.
+  - `verify` now only returns a boolean.
+- `fromData` has been renamed to to `create`.
+  - Generating or parsing multiple integrity hashes is not supported.
+- `ssri`'s `strict` mode is now the default and only mode.
+- The `Integrity` class is no more and `parse`, `create` will generate a `Hash` object containing your single hash.

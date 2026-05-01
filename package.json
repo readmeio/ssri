@@ -2,38 +2,36 @@
   "name": "@readme/ssri",
   "version": "4.0.0",
   "description": "Standard Subresource Integrity library -- parses, generates, and verifies integrity metadata according to the SRI spec.",
+  "bugs": {
+    "url": "https://github.com/readmeio/ssri/issues"
+  },
   "license": "MIT",
   "author": "ReadMe <support@readme.io> (https://readme.com)",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "engines": {
-    "node": ">=22"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/readmeio/ssri.git"
   },
-  "bugs": {
-    "url": "https://github.com/readmeio/ssri/issues"
-  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "format": "npm run prettier && npx biome check --write",
-    "lint": "biome check",
+    "format": "npx oxlint --fix && npx oxfmt --write",
+    "lint": "npx oxlint && npx oxfmt --check",
     "prebuild": "rm -rf dist/",
     "prepack": "npm run build",
     "pretest": "npm run lint",
-    "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
     "test": "vitest --coverage"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.10",
-    "@readme/standards": "^2.4.0",
+    "@readme/oxlint-config": "^1.1.2",
     "@types/node": "^25.0.3",
     "@vitest/coverage-v8": "^4.1.2",
-    "prettier": "^3.0.3",
+    "oxfmt": "^0.47.0",
+    "oxlint": "^1.62.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2"
   },
-  "prettier": "@readme/standards/prettier"
+  "engines": {
+    "node": ">=22"
+  }
 }
