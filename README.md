@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This library is now deprecated and will no longer be updated. Please use [`ssri`](https://npm.im/ssri) instead.
+
 # @readme/ssri
 
 [`ssri`](https://github.com/npm/ssri), short for Standard Subresource
